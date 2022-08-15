@@ -152,3 +152,14 @@ bundle: manifests
 .PHONY: bundle-build
 bundle-build:
 	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
+
+.PHONY: api-clients
+api-clients:
+	rm -rf apis/k6/generated
+	go run k8s.io/code-generator/cmd/client-gen \
+	    --input-base "github.com/grafana/k6-operator/apis" \
+	    --input "k6/v1alpha1" \
+	    --output-package "github.com/grafana/k6-operator/apis/k6/generated" \
+	    --clientset-name clientset
+	mv github.com/grafana/k6-operator/apis/k6/generated apis/k6
+	rm -rf github.com/grafana/k6-operator/apis/k6
